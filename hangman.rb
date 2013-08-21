@@ -1,63 +1,64 @@
-word = %w(january sunday cat book map table dog december music love coding argentina).sample
 
-def get_letter 
-    return gets.chomp
+ 
+words = %w"love music summer coding kitchen december london table travel yellow"
+total_chances = 5
+wrong_try = 0
+right_guess = ''
+ 
+hanged = <<HANG
+GAME OVER, YOU ARE HANGED
+HANG
+
+survived = <<WIN
+YOU WIN!! YOU ARE A STAR!
+WIN
+  
+word = words[rand(words.length) - 1]
+ 
+def get_hidden (sample_word, guessed_words)
+  hidden = ''
+  sample_word.chars { |char| 
+    hidden += (guessed_words.include? char)? char : '#'
+  }
+ 
+  hidden
 end
-
-print "Welcome to the hangman game! Please enter a letter"
-    letter = get_letter
-
-
-def get_display(word)
-
-    disp=''
-    for i in 0...word.length
-        disp=disp+'-'
-    end
-    return disp
-end
-
-
-def is_letter_in_word(word,letter)
-    if (word == nil)
-        return false
+ 
+puts `clear`
+puts 'Guess what is this word:'+ get_hidden(word, '')
+ 
+while true
+  print "Enter a letter, you have #{total_chances - wrong_try} chances left:"
+ 
+  char = gets.chomp
+  puts `clear`
+  
+  if word.include? char
+ 
+    if(right_guess.include? char)
+      puts "You had already entered '#{char}'."
+      puts 'Have another go: ' + get_hidden(word, right_guess)
     else
-        if(word.index(letter)!=nil)
-            return true
-        else
-            return false
-        end
+      right_guess = right_guess + char
+      hidden = get_hidden(word, right_guess)
+ 
+      puts 'Well done! ' + hidden
     end
-end
-
-
-def get_letter(word,letter,display)
-
-    if (word == nil)
-        return
+ 
+    unless hidden.include? '#'
+      puts survived
+      break
+    end
+  else
+    puts "Nope, the word dosen't contains '#{char}'..."
+    wrong_try += 1
+ 
+    if (wrong_try == total_chances)
+      puts hanged
+      break
     else
-        while(word.index(letter)!=nil)
-            index=word.index(letter)
-            display = display[0,index] + letter + display[index + 1,display.length]
-            word = word[0,index] + '-' + word[index + 1, word.length]
-        end
+      puts 'Have another go: ' + get_hidden(word, right_guess)
     end
-    return display;
-
+  end
+ 
 end
-
-
-def is_finished(word, display, left)
-    if(left!=0)
-        if(word==display)
-            return 'finished'
-        else
-            return 'continue'
-        end
-    else
-        return 'lose'
-    end
-    
-end
-
-is_finished(get_letter(is_letter_in_word(get_display(word),letter),letter,display),left)
